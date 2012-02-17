@@ -81,4 +81,4 @@
           (. root -innerHTML))))))
 ;;?>
 
-;; vim: set lispwords+=describe,expect,it:
+;;. vim: set lispwords+=describe,expect,it:
