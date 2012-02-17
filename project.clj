@@ -5,14 +5,14 @@
   :description "Selector based templating for Clojurescript"
 
   ;;<?
-  ;;The only dependencies are this needed for testing.
+  ;; The only dependencies are those needed for testing.
   :dependencies
   [[jasminejs "0.1.0-SNAPSHOT"]]
 
   :dev-dependencies
   [[lein-clojurescript "1.1.1-SNAPSHOT"]]
   ;;?>
-  
+
   :cljs
   {:test-cmd ["phantomjs" "test.js"]
    :optimizations :whitespace
