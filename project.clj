@@ -18,7 +18,10 @@
    :optimizations :whitespace
    :pretty-print true
    :output-to "out/all.js"
-   :output-dir "out"})
+   :output-dir "out"}
+
+  :story
+  {:output "doc/index.html"})
 
 ;;%include README.md
 ;;%include src/select.cljs
