@@ -1,5 +1,7 @@
 ;; # The code
 (ns select
+  (:use
+    [goog.dom :only (replaceNode)])
   ;;<?
   ;; Testing imports
   (:require
@@ -45,15 +47,22 @@
 ;; The `fill` function takes a root node, a map from queries to functions, and
 ;; an optional `:selector-fn` key with a function value. `fill` simply iterates
 ;; through each query in the map and calls the associated function for each
-;; matching node. The functions take a single node argument and are expected to
-;; mutate it in-place. Queries that don't match anything are ignored.
+;; matching node. The functions take a single node argument and may do one of
+;; two things:
+;;
+;; 1. return a single node to replace the matched node;
+;;
+;; 2. return nil, and modify the matched node in place.
+;;
+;; Queries that don't match anything are ignored.
 (defn ^:export fill
   [root-node query-map & opts]
   (let [opts (apply hash-map opts)
         query-fn (get-selector-fn (:selector-fn opts))]
     (doseq [[query func] query-map
-            node (query-fn root-node query)]
-      (func node))))
+            matched-node (query-fn root-node query)]
+      (when-let [new-node (func matched-node)]
+        (replaceNode new-node matched-node)))))
 
 ;;<?
 (describe "fill"
@@ -61,10 +70,10 @@
     (let [root (. js/document (createElement "div"))]
       (set! (. root -innerHTML)
             "The <span class='verb'>quick</span> brown fox")
-    (expect = "The SLOW brown fox"
-      (do
-        (fill root {".verb" #(set! (. % -outerText) "SLOW")})
-        (. root -innerHTML)))))
+      (expect = "The SLOW brown fox"
+        (do
+          (fill root {".verb" #(set! (. % -outerText) "SLOW")})
+          (. root -innerHTML)))))
   (it "should replace multiples"
     (let [root (. js/document (createElement "div"))]
       (set! (. root -innerHTML)

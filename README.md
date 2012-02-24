@@ -22,8 +22,9 @@ Such a system requires only a simple API.
 
 (def selector-map
   {".title" (fn [matched-node]
-              (set! (. matched-node -innerText)
-                    (:title data)))})
+              (let [node (. matched-node cloneNode)]
+                (set! (. node -innerText)
+                      (:title data))))})
 
 (defn css-query [root-node query]
   (. root (querySelectorAll query)))
