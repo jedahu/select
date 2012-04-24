@@ -1,17 +1,17 @@
 ;; # Select: simple templating
 
 (defproject
-  select "0.1.0-SNAPSHOT"
+  select "0.1.0"
   :description "Selector based templating for Clojurescript"
 
   :dependencies
-  [[cst "0.2.4-SNAPSHOT"]]
+  [[cst "0.2.4"]]
 
   :dev-dependencies
-  [[menodora "0.1.4-SNAPSHOT"]]
+  [[menodora "0.1.4"]]
 
   :plugins
-  [[lein-cst "0.2.4-SNAPSHOT"]]
+  [[lein-cst "0.2.4"]]
 
   :cst
   {:suites [select.test.client/core-tests]
