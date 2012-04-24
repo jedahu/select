@@ -1,15 +1,7 @@
 ;; # The code
 (ns select
   (:use
-    [goog.dom :only (replaceNode)])
-  ;;<?
-  ;; Testing imports
-  (:require
-    [clojure.string :as string])
-  (:use-macros
-    [jasminejs.core :only (describe it expect)])
-  ;;?>
-  )
+    [goog.dom :only (replaceNode)]))
 
 ;; Selector functions take a root node, a query, and return a sequence of
 ;; descendent nodes that match the query. This makes it easy to change the
@@ -44,6 +36,19 @@
                 (js/Error.
                   "No usable selector-fn found. Please supply one.")))))
 
+(defn ?wrap-replacement
+  [x]
+  (if (instance? js/Node x)
+    x
+    (. js/document createTextNode (str x))))
+
+(defn do-replace
+  [rep matched-node]
+  (?wrap-replacement
+    (if (fn? rep)
+      (rep matched-node)
+      rep)))
+
 ;; The `fill` function takes a root node, a map from queries to functions, and
 ;; an optional `:selector-fn` key with a function value. `fill` simply iterates
 ;; through each query in the map and calls the associated function for each
@@ -59,35 +64,9 @@
   [root-node query-map & opts]
   (let [opts (apply hash-map opts)
         query-fn (get-selector-fn (:selector-fn opts))]
-    (doseq [[query func] query-map
+    (doseq [[query rep] query-map
             matched-node (query-fn root-node query)]
-      (when-let [new-node (func matched-node)]
+      (when-let [new-node (do-replace rep matched-node)]
         (replaceNode new-node matched-node)))))
-
-;;<?
-(describe "fill"
-  (it "should replace singles"
-    (let [root (. js/document (createElement "div"))]
-      (set! (. root -innerHTML)
-            "The <span class='verb'>quick</span> brown fox")
-      (expect = "The SLOW brown fox"
-        (do
-          (fill root {".verb" #(set! (. % -outerText) "SLOW")})
-          (. root -innerHTML)))))
-  (it "should replace multiples"
-    (let [root (. js/document (createElement "div"))]
-      (set! (. root -innerHTML)
-            "A <span class='adj'>little</span> <span class='adj'>squirmy</span> worm")
-      (expect = "A ADJECTIVE ADJECTIVE worm"
-        (do
-          (fill root {".adj" #(set! (. % -outerText) "ADJECTIVE")})
-          (. root -innerHTML)))))
-  (it "should ignore non-matching queries"
-    (let [root (. js/document (createElement "div"))]
-      (expect = ""
-        (do
-          (fill root {".nothing" #(set! (. % -innerText) "NEVER SEEN")})
-          (. root -innerHTML))))))
-;;?>
 
 ;;. vim: set lispwords+=describe,expect,it:
