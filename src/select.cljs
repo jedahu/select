@@ -23,7 +23,10 @@
 ;; The second uses [Sizzle](http://sizzlejs.com).
 (defn sizzle-selector
   [root-node query]
-    (js/Sizzle query root-node))
+  (-> js/window
+    (aget "Sizzle")
+    (. call nil query root-node)
+    seq<-))
 
 ;; If no selector function is provided to [[fill]] and `window.Sizzle` exists,
 ;; then `sizzle-selector` is used, otherwise `default-css-selector` is used.
